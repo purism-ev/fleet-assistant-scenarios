@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>車輛助理情境示範</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f4f1; --surface:#fff; --surface-2:#f8f9f6; --ink:#1d1f1e; --muted:#67706c; --line:#dfe3df;
+  --accent:#23707a; --accent-soft:#deeff0;
+  --blue:#3a6aa0; --purple:#86589c; --warn:#b0611c;
+  --code-bg:#eef1ec;
+  --font:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161817; --surface:#202322; --surface-2:#1a1d1c; --ink:#e9ece9; --muted:#9aa29e; --line:#333836;
+    --accent:#6cc0c8; --accent-soft:#1a2e30; --blue:#7fa8d8; --purple:#c49ad8; --warn:#e39a5a; --code-bg:#272b29; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161817; --surface:#202322; --surface-2:#1a1d1c; --ink:#e9ece9; --muted:#9aa29e; --line:#333836;
+  --accent:#6cc0c8; --accent-soft:#1a2e30; --blue:#7fa8d8; --purple:#c49ad8; --warn:#e39a5a; --code-bg:#272b29; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15.5px;line-height:1.75}
+code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 60px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--accent)}
+h1{margin:6px 0 6px;font-size:26px;line-height:1.3}
+.sub{margin:0 0 12px;color:var(--muted);max-width:720px}
+.points{list-style:none;padding:0;margin:0 0 22px;display:flex;flex-wrap:wrap;gap:8px}
+.points li{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:14px}
+.points li::before{content:"✓ ";color:var(--accent);font-weight:700}
+section{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 28px}
+@media (max-width:600px){section{padding:20px 18px}}
+.mock-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px}
+.mock-tabs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer}
+.mock-tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.mock-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mock-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:1000px){.mock-grid{grid-template-columns:1fr}.mphone-wrap{justify-self:center}}
+.mphone{width:320px;max-width:100%;height:660px;background:#111;border-radius:44px;padding:11px;box-shadow:0 18px 44px rgba(0,0,0,.2)}
+.mscreen{--m-bg:#f7f6f2;--m-ink:#24231f;--m-muted:#7a7870;--m-line:#e4e1d8;--m-user:#ebe8e0;--m-chip:#efece5;--m-acc:#c96a3d;
+  width:100%;height:100%;border-radius:34px;overflow:hidden;background:var(--m-bg);color:var(--m-ink);display:flex;flex-direction:column;position:relative;font-size:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .mscreen{--m-bg:#1f1e1c;--m-ink:#ecebe6;--m-muted:#a09e96;--m-line:#363531;--m-user:#2f2e2b;--m-chip:#2a2927;--m-acc:#e08a5e}}
+:root[data-theme="dark"] .mscreen{--m-bg:#1f1e1c;--m-ink:#ecebe6;--m-muted:#a09e96;--m-line:#363531;--m-user:#2f2e2b;--m-chip:#2a2927;--m-acc:#e08a5e}
+.m-status{display:flex;justify-content:space-between;padding:12px 24px 2px;font-size:12px;font-weight:600}
+.m-top{display:flex;align-items:center;justify-content:space-between;padding:6px 14px 8px;border-bottom:1px solid var(--m-line)}
+.m-top .ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--m-muted);font-size:16px}
+.m-top .ttl{text-align:center;line-height:1.25;min-width:0}
+.m-top .ttl b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.m-top .ttl span{font-size:11px;color:var(--m-muted)}
+.m-chat{flex:1;overflow-y:auto;padding:12px 14px 10px;scroll-behavior:smooth}
+.m-empty{color:var(--m-muted);text-align:center;margin-top:40%;font-size:13px}
+.m-u{background:var(--m-user);border-radius:16px 16px 4px 16px;padding:8px 12px;margin:0 0 12px auto;max-width:82%;width:fit-content;animation:mIn .25s ease}
+.m-b{margin:0 0 12px;animation:mIn .25s ease;line-height:1.65}
+.m-b p{margin:0 0 6px}
+.m-b ul,.m-b ol{margin:2px 0 6px;padding-left:18px}
+.m-b li{margin-bottom:3px}
+.m-b .warnline{color:#b0611c;font-weight:500}
+.m-b .card{border:1px solid var(--m-line);border-radius:12px;padding:8px 10px;margin:6px 0;font-size:13px}
+.m-b .card .row{display:flex;gap:8px;padding:2px 0}
+.m-b .card .k{color:var(--m-muted);width:70px;flex:none}
+.m-b .fix{background:rgba(201,106,61,.14);border-radius:4px;padding:0 3px}
+.m-b .ev{font-size:12.5px;color:var(--m-muted)}
+.m-b svg{display:block;width:100%;height:auto;margin:4px 0 2px}
+@keyframes mIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.m-tool{display:flex;align-items:center;gap:8px;background:var(--m-chip);border-radius:10px;padding:6px 10px;margin:0 0 10px;font-size:12px;color:var(--m-muted);width:fit-content;max-width:100%;animation:mIn .25s ease}
+.m-tool .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--m-muted);border-top-color:transparent;animation:spin .8s linear infinite;flex:none}
+.m-tool.done .dot{animation:none;border:0;background:#2f7d4f;display:grid;place-items:center}
+.m-tool.done .dot::after{content:"✓";color:#fff;font-size:8px;line-height:12px}
+.m-tool code{background:none;padding:0;font-size:11.5px;color:var(--m-ink);word-break:break-all}
+.m-input{border-top:1px solid var(--m-line);padding:8px 10px 18px;display:flex;align-items:flex-end;gap:8px}
+.m-input .plus{width:32px;height:32px;border-radius:50%;border:1px solid var(--m-line);display:grid;place-items:center;color:var(--m-muted);flex:none}
+.m-input .field{flex:1;min-width:0;min-height:34px;border:1px solid var(--m-line);border-radius:18px;padding:6px 12px;font-size:13.5px;color:var(--m-muted);line-height:1.5;max-height:110px;overflow:hidden}
+.m-input .field.typing{color:var(--m-ink)}
+.m-input .mic{width:34px;height:34px;border-radius:50%;background:var(--m-chip);display:grid;place-items:center;flex:none;font-size:15px}
+.m-input .mic.rec{background:#c0392b;color:#fff;animation:pulse 1.4s infinite}
+.m-dict{display:none;align-items:center;gap:6px;font-size:11px;color:#c0392b;padding:0 12px 4px}
+.m-dict.on{display:flex}
+.m-dict i{width:3px;height:10px;background:#c0392b;border-radius:2px;animation:w .8s infinite ease-in-out}
+.m-dict i:nth-child(2){animation-delay:.1s}.m-dict i:nth-child(3){animation-delay:.2s}.m-dict i:nth-child(4){animation-delay:.3s}
+.mock-ctrl{display:flex;gap:8px;margin-top:14px;width:320px;max-width:100%;justify-content:center}
+.mock-ctrl button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 14px;cursor:pointer}
+.mock-ctrl button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.mock-ctrl button:disabled{opacity:.45;cursor:default}
+.mock-ctrl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mnotes{list-style:none;padding:0;margin:0;counter-reset:mn}
+.mnotes li{position:relative;padding:10px 12px 10px 40px;border-radius:10px;margin-bottom:6px;font-size:14px;color:var(--muted);transition:.2s;counter-increment:mn}
+.mnotes li::before{content:counter(mn);position:absolute;left:10px;top:11px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700}
+.mnotes li .w{display:block;font-size:11.5px;font-weight:700;letter-spacing:.04em;margin-bottom:1px}
+.mnotes li .w code{font-weight:500;letter-spacing:0}
+.mnotes li.past{color:var(--ink)}
+.mnotes li.past::before{background:var(--line)}
+.mnotes li.cur{background:var(--accent-soft);color:var(--ink)}
+.mnotes li.cur::before{border-color:var(--accent);background:var(--accent);color:#fff}
+.mnotes li .w.u{color:var(--blue)} .mnotes li .w.t{color:var(--purple)} .mnotes li .w.b{color:var(--accent)} .mnotes li .w.n{color:var(--warn)}
+.mock-note{font-size:13px;color:var(--muted);margin-top:14px}
+.persona{font-size:13px;color:var(--muted);margin:0 0 10px}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,.45)}70%{box-shadow:0 0 0 12px rgba(192,57,43,0)}100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}}
+@keyframes w{0%,100%{height:4px}50%{height:12px}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.m-chat{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">車輛助理 情境示範</div>
+  <h1>用說的，掌握每一台車的狀況</h1>
+  <p class="sub">技術服務技師在手機上的 Claude App 對話，按麥克風說話即可。助理會連到車隊資料，告訴你這週該特別看哪幾台車、原因是什麼，巡檢完也能用講的完成回報。</p>
+  <ul class="points">
+    <li>出發前問一句，就知道要特別看哪幾台</li>
+    <li>巡檢結果講 30 秒就記錄完成，不用填表</li>
+    <li>客戶問起，服務紀錄馬上查得到</li>
+  </ul>
+<section id="mock">
+  <div class="mock-tabs" id="mockTabs">
+    <button class="on" data-s="0">服務前準備</button>
+    <button data-s="1">服務後記錄</button>
+    <button data-s="2">查服務紀錄</button>
+  </div>
+  <div class="mock-grid">
+    <div class="mphone-wrap">
+      <div class="mphone"><div class="mscreen">
+        <div class="m-status"><span id="mClock">08:40</span><span>5G ▮▮▮</span></div>
+        <div class="m-top"><span class="ic">☰</span><div class="ttl"><b id="mTitle">新對話</b><span>車輛助理</span></div><span class="ic">✎</span></div>
+        <div class="m-chat" id="mChat"></div>
+        <div class="m-dict" id="mDict"><i></i><i></i><i></i><i></i>聽寫中…</div>
+        <div class="m-input"><span class="plus">＋</span><div class="field" id="mField">傳送訊息</div><span class="mic" id="mMic">🎙</span></div>
+      </div></div>
+      <div class="mock-ctrl">
+        <button id="mReset">↺ 重來</button>
+        <button id="mPlay">▶ 自動播放</button>
+        <button id="mNext" class="primary">下一步 →</button>
+      </div>
+    </div>
+    <div>
+      <p class="persona" id="mPersona"></p>
+      <ol class="mnotes" id="mNotes"></ol>
+      <p class="mock-note">畫面為示意，實際介面以 Claude App 為準。客戶名稱、人名、車號與數據皆為範例。使用者以一般對話搭配語音聽寫輸入；系統動作在 App 中會顯示為可展開的項目，通常不需要點開。</p>
+    </div>
+  </div>
+</section>
+</div>
+<script>
+(function(){
+const TEMP_SVG='<svg viewBox="0 0 260 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="近 7 天充電末端溫度"><line x1="28" y1="70" x2="252" y2="70" stroke="currentColor" stroke-opacity=".25"/><line x1="28" y1="12" x2="28" y2="70" stroke="currentColor" stroke-opacity=".25"/><line x1="28" y1="48" x2="252" y2="48" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="3 3"/><text x="250" y="45" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="end">同場域平均 42°C</text><text x="24" y="22" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="end">50</text><text x="24" y="73" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="end">36</text><polygon fill="#c96a3d" fill-opacity=".15" points="40,56 72,54 104,58 136,40 168,36 200,33 232,30 232,18 200,21 168,24 136,28 104,50 72,46 40,48"/><polyline fill="none" stroke="#c96a3d" stroke-width="2" points="40,52 72,50 104,54 136,34 168,30 200,27 232,24"/><circle cx="232" cy="24" r="3" fill="#c96a3d"/><text x="40" y="82" font-size="8" fill="currentColor" fill-opacity=".6">10/22</text><text x="232" y="82" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="middle">10/28</text></svg>';
+const HIST_SVG='<svg viewBox="0 0 260 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="0237 巡檢前後充電末端溫度"><line x1="28" y1="70" x2="252" y2="70" stroke="currentColor" stroke-opacity=".25"/><line x1="28" y1="12" x2="28" y2="70" stroke="currentColor" stroke-opacity=".25"/><line x1="28" y1="45" x2="252" y2="45" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="3 3"/><text x="250" y="42" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="end">同場域平均 42°C</text><line x1="152" y1="12" x2="152" y2="70" stroke="#2f7d4f" stroke-width="1.2" stroke-dasharray="2 2"/><text x="155" y="20" font-size="8" fill="#2f7d4f">10/30 補水</text><text x="24" y="16" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="end">50</text><text x="24" y="73" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="end">36</text><polyline fill="none" stroke="#c96a3d" stroke-width="2" points="40,49 72,37 104,24 136,20"/><polyline fill="none" stroke="#2f7d4f" stroke-width="2" points="168,41 200,45 232,45"/><line x1="136" y1="20" x2="168" y2="41" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="2 2"/><circle cx="136" cy="20" r="3" fill="#c96a3d"/><circle cx="232" cy="45" r="3" fill="#2f7d4f"/><text x="40" y="82" font-size="8" fill="currentColor" fill-opacity=".6">10/22</text><text x="136" y="82" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="middle">10/29</text><text x="232" y="82" font-size="8" fill="currentColor" fill-opacity=".6" text-anchor="middle">11/5</text></svg>';
+const SCENES=[
+ {title:'宏遠倉儲 巡檢準備', who:'技師', clock:'08:50', persona:'小林・技術服務技師，明天（10/30）要到宏遠倉儲做月巡檢，共 18 台', steps:[
+  {t:'user', dictate:true, text:'明天宏遠巡檢', note:'出發前一天先問好，到了倉庫訊號不穩也不受影響。'},
+  {t:'tool', name:'get_inspection_schedule', arg:'宏遠倉儲, 未來 7 天', note:'找到明天的巡檢場次，共 18 台。'},
+  {t:'tool', name:'list_findings', arg:'宏遠倉儲, 未處理', note:'調出 3 台需要注意的車，以及判斷的依據。'},
+  {t:'tool', name:'get_health', arg:'宏遠倉儲 18 台', note:'查每台車的電池健康度與內阻，用來判斷老化程度，也用來估算要帶多少蒸餾水。'},
+  {t:'bot', html:'<p><b>宏遠倉儲 月巡檢・10/30・18 台</b></p><p><b>特別看 3 台</b></p><ul><li><span class="warnline">0237</span>｜電解液偏低・已 5 天・可信度 86%<br><span class="ev">充電末端電壓比同批車高 1.4V、溫度高 6°C → 請補水、量比重</span></li><li>0220｜電池健康度 73%・內阻上升 18%<br><span class="ev">請量各格電壓並記錄，評估是否需要更換</span></li><li>0231｜電池健康度 74%<br><span class="ev">同上</span></li></ul><p><b>其餘 15 台</b>　近 30 天沒有異常</p><p class="ev">建議攜帶：蒸餾水約 40 公升（依各車近 30 天用電量估算）、比重計</p>',
+   note:'最上面是這次要特別看的車和原因，連要帶的東西都先估好，不用到現場才發現不夠。'},
+  {t:'user', dictate:true, text:'給我看 0237 這週充電的溫度', note:'想看依據，直接問。'},
+  {t:'tool', name:'query_timeseries', arg:'0237, 充電末端溫度, 近 7 天', note:'調出這台車近 7 天的充電溫度紀錄。'},
+  {t:'tool', name:'aggregate', arg:'宏遠倉儲, 充電末端溫度, 近 7 天', note:'同時取同場域其他車的平均值，方便比較。'},
+  {t:'bot', html:'<p>0237 近 7 天的充電末端溫度（色帶為每 15 分鐘的最高與最低值）：</p>'+TEMP_SVG+'<p class="ev">10/24 起每天都超過 45°C，前一週最高只有 41°C；同場域其他 17 台平均為 42°C。</p>',
+   note:'助理直接畫成圖，一眼就看得出從哪一天開始異常。'}
+ ]},
+ {title:'宏遠倉儲 巡檢回報', who:'技師', clock:'16:10', persona:'小林・技術服務技師，剛完成宏遠倉儲 18 台的月巡檢', steps:[
+  {t:'user', dictate:true, text:'巡完了。0237 補水完，3 號格跟 7 號格比重 1.18，其他 1.26，連接器氧化清了。0220 跟 0231 各格電壓都差不多，就是老了。其他 15 台都正常', note:'巡完用講的回報，30 秒就記完整個場域，不用填表。'},
+  {t:'tool', name:'log_inspection_result', arg:'宏遠倉儲 10/30, 3 台處理＋15 台正常', note:'自動把技師說的內容對應到每一台車：0237 確認電解液偏低，並新增「單格劣化」的觀察；0220、0231 確認電池老化；其餘 15 台正常。'},
+  {t:'bot', html:'<p>18 台都已記錄完成：</p><div class="card"><div class="row"><span class="k">0237</span><span>電解液偏低 <span class="fix">已確認</span>・新發現：3、7 號格比重偏低</span></div><div class="row"><span class="k">0220／0231</span><span>電池老化 <span class="fix">已確認</span></span></div><div class="row"><span class="k">其餘 15 台</span><span>例行檢查正常</span></div></div><p class="ev">0237 的 3、7 號格，下個月巡檢時會提醒複查（已記在 11/27 場次備註）。</p>',
+   note:'記錄完會列出對應結果讓技師確認。現場確認的結果也會回饋給系統，讓之後的提醒越來越準。'}
+ ]},
+ {title:'0237 服務紀錄', who:'技師', clock:'10:15', persona:'小林・技術服務技師，11/5 接到宏遠倉儲王經理來電，詢問 3 號車（0237）最近的狀況', steps:[
+  {t:'user', dictate:true, text:'宏遠的 3 號車之前處理過什麼', note:'客戶來電詢問時，直接用客戶習慣的說法問就好。'},
+  {t:'tool', name:'search_vehicles', arg:'宏遠倉儲, 3 號車', note:'把客戶說的「3 號車」對應到車號 0237。'},
+  {t:'tool', name:'list_inspection_results', arg:'0237, 近 6 個月', note:'調出這台車近 6 個月的巡檢與處理紀錄。'},
+  {t:'bot', html:'<p><b>宏遠倉儲 3 號車（0237）・近 6 個月服務紀錄</b></p><ul><li><b>10/30</b>　小林・月巡檢<br><span class="ev">電解液偏低 → 已補水；3、7 號格比重 1.18（其他 1.26）；連接器除氧化</span></li><li><b>9/25</b>　小林・月巡檢<br><span class="ev">例行檢查正常</span></li><li><b>8/28</b>　阿明・月巡檢<br><span class="ev">例行檢查正常</span></li></ul><p class="ev">下次巡檢 11/27，已排定複查 3、7 號格。</p>',
+   note:'依時間排好，誰在哪天做了什麼一目了然。'},
+  {t:'user', dictate:true, text:'補水之後有改善嗎', note:'可以接著追問處理後的效果。'},
+  {t:'tool', name:'query_timeseries', arg:'0237, 充電末端溫度, 10/22–11/5', note:'調出處理前後的充電溫度。'},
+  {t:'bot', html:'<p>有改善。0237 處理前後的充電末端溫度：</p>'+HIST_SVG+'<p class="ev">補水前最高到 48°C；10/30 處理後回到 41–43°C，和同場域其他車差不多。</p><p>可以跟王經理說：問題已處理、溫度已恢復正常，3、7 號格會在 11/27 巡檢時再複查。</p>',
+   note:'有處理前後的數據，回覆客戶時更有說服力。'}
+ ]},
+];
+let sc=0, idx=0, playing=null, typing=null;
+const $=id=>document.getElementById(id);
+const chat=$('mChat'), field=$('mField'), mic=$('mMic'), dict=$('mDict'), notes=$('mNotes');
+function esc(t){return t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function load(i){
+  stop(); sc=i; idx=0;
+  document.querySelectorAll('#mockTabs button').forEach(b=>b.classList.toggle('on',+b.dataset.s===i));
+  const S=SCENES[i];
+  $('mTitle').textContent='新對話'; $('mClock').textContent=S.clock; $('mPersona').textContent=S.persona;
+  chat.innerHTML='<div class="m-empty">按「下一步」開始</div>';
+  resetInput();
+  const lbl={user:['u',S.who],tool:['t','系統動作'],bot:['b','助理回覆'],notify:['n','提醒']};
+  notes.innerHTML=S.steps.map(st=>{const[c,w]=lbl[st.t];return `<li><span class="w ${c}">${w}${st.t==='tool'?' <code>'+st.name+'</code>':''}</span>${st.note}</li>`}).join('');
+  updCtrl();
+}
+function resetInput(){ field.textContent='傳送訊息'; field.classList.remove('typing'); mic.classList.remove('rec'); dict.classList.remove('on'); }
+function updCtrl(){
+  const n=SCENES[sc].steps.length;
+  $('mNext').disabled = idx>=n || typing!==null;
+  $('mPlay').textContent = playing? '❚❚ 暫停':'▶ 自動播放';
+  $('mPlay').disabled = idx>=n && !playing;
+  [...notes.children].forEach((li,j)=>{li.classList.toggle('past',j<idx-1);li.classList.toggle('cur',j===idx-1)});
+}
+function scrollChat(){ chat.scrollTop=chat.scrollHeight; }
+function clearEmpty(){ const e=chat.querySelector('.m-empty'); if(e) e.remove(); }
+function next(done){
+  const S=SCENES[sc]; if(idx>=S.steps.length||typing!==null) return;
+  const st=S.steps[idx]; idx++;
+  if(st.t==='user'&&$('mTitle').textContent==='新對話') $('mTitle').textContent=S.title;
+  if(st.t==='user'){
+    clearEmpty(); if(st.dictate){mic.classList.add('rec'); dict.classList.add('on');} field.classList.add('typing'); field.textContent='';
+    let k=0; const txt=st.text; const speed=Math.max(18, Math.min(45, 1400/txt.length));
+    typing=setInterval(()=>{ k+=1; field.textContent=txt.slice(0,k); if(k>=txt.length){ clearInterval(typing); typing=null;
+        setTimeout(()=>{ resetInput(); chat.insertAdjacentHTML('beforeend',`<div class="m-u">${esc(txt)}</div>`); scrollChat(); updCtrl(); done&&done(); },350);
+      } },speed);
+    updCtrl(); return;
+  }
+  clearEmpty();
+  if(st.t==='tool'){
+    chat.insertAdjacentHTML('beforeend',`<div class="m-tool"><span class="dot"></span><code>${esc(st.name)}(${esc(st.arg)})</code></div>`);
+    const el=chat.lastElementChild; scrollChat(); typing=1; updCtrl();
+    setTimeout(()=>{ el.classList.add('done'); typing=null; updCtrl(); done&&done(); },650);
+    return;
+  }
+  if(st.t==='bot'){ chat.insertAdjacentHTML('beforeend',`<div class="m-b">${st.html}</div>`); scrollChat(); updCtrl(); done&&done(); }
+}
+function stop(){ if(playing){clearTimeout(playing);playing=null;} if(typing&&typing!==1){clearInterval(typing);} typing=null; }
+function autoplay(){
+  if(idx>=SCENES[sc].steps.length){ playing=null; updCtrl(); return; }
+  next(()=>{ if(!playing) return; playing=setTimeout(autoplay,1200); });
+}
+$('mNext').onclick=()=>next();
+$('mReset').onclick=()=>load(sc);
+$('mPlay').onclick=()=>{ if(playing){ clearTimeout(playing); playing=null; updCtrl(); } else { playing=1; updCtrl(); autoplay(); } };
+document.querySelectorAll('#mockTabs button').forEach(b=>b.onclick=()=>load(+b.dataset.s));
+load(0);
+})();
+</script>
+</body>
+</html>
